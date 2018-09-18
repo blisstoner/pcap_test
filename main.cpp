@@ -31,15 +31,17 @@ public:
     u_char* option;
     u_int IHL;
     void printIP(int isDest);
+    ~IPv4_header();
 };
 void IPv4_header::printIP(int isDest){
-    IPv4_header ipHeader;
     u_int ip;
     if(isDest) ip = destIP;
     else ip = srcIP;
     printf("%d.%d.%d.%d\n",ip>>24,((ip>>16 & 0xff)),((ip>>8)&0xff),ip&0xff);
 }
-
+IPv4_header::~IPv4_header(){
+    if(option) delete [] option;
+}
 class TCP_header{
 public:
     u_short srcPort, destPort;
@@ -48,7 +50,11 @@ public:
     u_short checksum, urgentPtr;
     u_char* option;
     u_int DataOffset;
+    ~TCP_header();
 };
+TCP_header::~TCP_header(){
+   if(option) delete [] option;
+}
 
 void dump(const u_char* p, int len){
 // parse Ethernet header
@@ -72,6 +78,7 @@ void dump(const u_char* p, int len){
         return;
     }
     IPv4_header ipHeader;
+    ipHeader.option = NULL;
     ipHeader.Ver_IHL = (u_char) *(p++);
     ipHeader.DSCP_ECN = (u_char) *(p++);
     ipHeader.len = ((u_short) *(p++)) << 8;
@@ -109,6 +116,7 @@ void dump(const u_char* p, int len){
             printf("ipHeader.IHL : %d\n",ipHeader.IHL);
             printf("length is not enough to parse ip header.\n");
             return;
+        
         }
         ipHeader.option = new u_char[(ipHeader.IHL-5)<<2];
         for(int i = 0; i < ((ipHeader.IHL-5)<<2); i++)
@@ -125,6 +133,7 @@ void dump(const u_char* p, int len){
         return;
     }
     TCP_header tcpHeader;
+    tcpHeader.option = NULL;
     tcpHeader.srcPort =  ((u_short) *(p++)) << 8;
     tcpHeader.srcPort |=  (u_short) *(p++);
     tcpHeader.destPort =  ((u_short) *(p++)) << 8;
