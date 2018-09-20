@@ -14,10 +14,10 @@ void ethernet_header::printMAC(int isDest){ // 0 : source, 1 : dest
    u_char* mac;
    if(isDest) mac = destMAC;
    else mac = srcMAC;
-   printf("%d",*mac);
+   printf("%02x",*mac);
    mac++;
    int len = 5;
-   while(len--) printf(":%d",*(mac++));
+   while(len--) printf(":%02x",*(mac++));
    printf("\n");
 }
 class IPv4_header{
